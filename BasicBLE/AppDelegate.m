@@ -19,7 +19,37 @@
     // Override point for customization after application launch.
     self.uuid = @"6E400001-B5A3-F393-­E0A9-­E50E24DCCA9E";
     
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    [self initRegion];
+    
     return YES;
+}
+
+- (void)initRegion {
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"23542266-18D1-4FE4-B4A1-23F8195B9D39"];
+    self.region = [[CLBeaconRegion alloc] initWithProximityUUID:uuid identifier:@"com.ilockhart.basicble"];
+    [self.locationManager startMonitoringForRegion:self.region];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
+    [self.locationManager startRangingBeaconsInRegion:self.region];
+}
+
+-(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
+    [self.locationManager stopRangingBeaconsInRegion:self.region];
+}
+
+-(void)locationManager:(CLLocationManager *)manager didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region {
+    CLBeacon *beacon = [[CLBeacon alloc] init];
+    beacon = [beacons lastObject]; // just take the last one
+    
+    NSLog(@"Major:%@ Minor:%@ Accuracy:%f Proximity:%d rssi:%ld",
+          beacon.major,
+          beacon.minor,
+          beacon.accuracy,
+          (int)beacon.proximity,
+          beacon.rssi);
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
